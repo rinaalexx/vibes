@@ -27,34 +27,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Получаем ссылку на Firestore
         val db = FirebaseFirestore.getInstance()
-// Пример добавления данных в Firestore
-        val user = hashMapOf(
-            "firstName" to "John",
-            "lastName" to "Doe",
-            "age" to 30
-        )
-
-        // Добавляем пользователя в коллекцию "users"
-        db.collection("users")
-            .add(user)
-            .addOnSuccessListener { documentReference ->
-                Log.d("Firestore", "DocumentSnapshot added with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w("Firestore", "Error adding document", e)
-            }
-
-        // Пример чтения данных из Firestore
-        db.collection("users")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Log.d("Firestore", "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w("Firestore", "Error getting documents.", exception)
-            }
 
         setContent {
             VibesTheme {
@@ -77,29 +49,17 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        composable("catalog") { backStackEntry ->
 
-                        composable(
-                            route = "catalog?category={category}",
-                            arguments = listOf(navArgument("category") {
-                                type = NavType.StringType
-                                defaultValue = "all"
-                                nullable = true
-                            })
-                        ) { backStackEntry ->
-                            val category = backStackEntry.arguments?.getString("category") ?: "all"
-                            CatalogScreen(navController = navController, categoryFilter = category)
+                            CatalogScreen(navController = navController)
                         }
 
-                        composable(
-                            "product/{productId}",
-                            arguments = listOf(navArgument("productId") { type = NavType.StringType })
-                        ) { backStackEntry ->
-                            val productId = backStackEntry.arguments!!.getString("productId")!!
-                            val product = findProductById(productId) // Реализуй поиск продукта в репозитории или списке
-                            ProductDetailScreen(product = product, onAddToCartClick = {
-                                // Обработка добавления в корзину
-                            })
+                       /* composable("catalog/{category}") { backStackEntry ->
+                            val category = backStackEntry.arguments?.getString("category")
+                            CatalogScreen(navController = navController, category = category ?: "all")
                         }
+*/
+
 
 
 

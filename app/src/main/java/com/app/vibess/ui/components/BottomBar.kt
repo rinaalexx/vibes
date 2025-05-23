@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.app.vibess.R
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ViewList   // для каталога
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -16,11 +17,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val title: String) {
     object Home : BottomNavItem("home", Icons.Filled.Home, "Home")
-    object Catalog : BottomNavItem("catalog", Icons.Filled.ViewList, "Catalog")
+    object Catalog : BottomNavItem("catalog", Icons.AutoMirrored.Filled.ViewList, "Catalog")
     object Cart : BottomNavItem("cart", Icons.Filled.ShoppingCart, "Cart")
     object Profile : BottomNavItem("profile", Icons.Filled.Person, "Profile")
 }
-
 
 @Composable
 fun BottomBar(navController: NavController) {
@@ -39,20 +39,20 @@ fun BottomBar(navController: NavController) {
                 label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
+                    // Добавьте правильный маршрут для каталога
                     if (currentRoute != item.route) {
-                        navController.navigate("home") {
+                        navController.navigate(item.route) {
+                            // Управление стеком навигации
                             popUpTo(navController.graph.startDestinationId) {
-                                inclusive = false // или true — зависит, хотите ли удалить старт или нет
+                                inclusive = false // Убедитесь, что не удаляем стартовый экран
                                 saveState = false
                             }
                             launchSingleTop = true
                             restoreState = false
                         }
-
                     }
-
                 }
-        )
+            )
         }
     }
 }

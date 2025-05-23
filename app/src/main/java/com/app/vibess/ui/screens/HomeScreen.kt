@@ -36,13 +36,8 @@ fun HomeScreen(
         CategoryItem("Hoodie", R.drawable.hoodie)
     )
 
-    // Товары
-    val products = listOf(
-        Product("1", "Кружка Vibes", 499.0),
-        Product("2", "Футболка Vibes", 1299.0, category = "tshirts"),
-        Product("3", "Коврик Vibes", 799.0),
-        Product("4", "Худи Vibes", 1599.0, category = "hoodie")
-    )
+
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -143,8 +138,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(320.dp) // подгоните под свой дизайн
         ) {
-            items(products) { product ->
-                ProductCardSimple(product = product)
+
             }
         }
 
@@ -153,7 +147,7 @@ fun HomeScreen(
         // Блок кастомизации с кнопкой CREATE NOW
 
     }
-}
+
 
 // Исправленный параметр category теперь правильного типа CategoryItem
 @Composable

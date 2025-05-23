@@ -32,7 +32,7 @@ fun ProductDetailScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Для примера, используем один URL, но можно расширить
-            items(listOf(product.imageUrl)) { imageUrl ->
+            items(listOf(product.image)) { imageUrl ->
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = product.name,
@@ -77,14 +77,7 @@ fun ProductDetailScreen(
     }
 
 }
-fun findProductById(productId: String): Product {
-    val products = listOf(
-        Product("1", "Кружка Vibes", 499.0, category = "all"),
-        Product("2", "Футболка Vibes", 1299.0, category = "tshirts"),
-        Product("3", "Коврик Vibes", 799.0, category = "all"),
-        Product("4", "Худи Vibes", 1599.0, category = "hoodie")
-    )
-    return products.firstOrNull { it.id == productId }
-        ?: throw IllegalArgumentException("Product with id $productId not found")
+fun findProductById(productId: String) {
+
 }
 

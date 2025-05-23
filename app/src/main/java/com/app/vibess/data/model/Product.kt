@@ -1,8 +1,10 @@
 package com.app.vibess.data.model
 data class Product(
-    val id: String,
     val name: String,
+    val category: String,
+    val color: String,
+    val image: String,
     val price: Double,
-    val imageUrl: String? = null,
-    val category: String = "all"  // например: "tshirts", "hoodie", "all"
+    val sku: Int,
+    val stock: Int
 )
