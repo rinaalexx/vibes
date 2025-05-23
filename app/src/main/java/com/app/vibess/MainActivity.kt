@@ -17,6 +17,7 @@ import com.app.vibess.ui.screens.HomeScreen
 import com.app.vibess.ui.components.BottomBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.app.vibess.ui.screens.CategoryDetailScreen
 import com.app.vibess.ui.screens.ProductDetailScreen
 import com.app.vibess.ui.screens.findProductById
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,16 +50,23 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        composable("catalog") { backStackEntry ->
 
-                            CatalogScreen(navController = navController)
-                        }
+                                        composable("catalog") {
+                                            CatalogScreen(navController = navController)
+                                        }
+                                        composable("catalog/{category}") { backStackEntry ->
+                                            val category = backStackEntry.arguments?.getString("category")
+                                            CategoryDetailScreen(category = category ?: "Unknown", navController = navController)
+                                        }
 
-                       /* composable("catalog/{category}") { backStackEntry ->
-                            val category = backStackEntry.arguments?.getString("category")
-                            CatalogScreen(navController = navController, category = category ?: "all")
-                        }
-*/
+
+
+
+                        /* composable("catalog/{category}") { backStackEntry ->
+                             val category = backStackEntry.arguments?.getString("category")
+                             CatalogScreen(navController = navController, category = category ?: "all")
+                         }
+ */
 
 
 
