@@ -65,9 +65,9 @@ fun CategoryDetailScreen(category: String, navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(products) { product ->
-                        ProductCard(product = product) {
-                            // При нажатии можно добавить переход в детали
-                        }
+                        ProductCard(product = product, onClick = {
+                            navController.navigate("product/${product.sku}")
+                        })
                     }
                 }
             }

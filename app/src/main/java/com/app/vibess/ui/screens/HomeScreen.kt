@@ -46,15 +46,7 @@ fun HomeScreen(
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        // Логотип
-        Image(
-            painter = painterResource(R.drawable.vibes),
-            contentDescription = "Логотип Vibes",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp),
-            contentScale = ContentScale.Fit
-        )
+
 
         Spacer(Modifier.height(24.dp))
 

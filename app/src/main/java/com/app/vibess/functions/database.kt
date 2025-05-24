@@ -26,5 +26,34 @@ fun getProductsFromFirestore(onResult: (List<Product>) -> Unit, onFailure: (Exce
         .addOnFailureListener { exception ->
             onFailure(exception)
         }
+    }
+
+
+fun findProductById(
+    sku: Int,
+    onSuccess: (Product) -> Unit,
+    onFailure: (Exception) -> Unit
+) {
+    val db = FirebaseFirestore.getInstance()
+
+    // Пытаемся найти продукт по SKU в коллекции products
+    db.collection("products")
+        .whereEqualTo("sku", sku)
+        .get()
+        .addOnSuccessListener { result ->
+            // Если продукт найден, передаем его в onSuccess
+            val product = result.documents.firstOrNull()?.toObject(Product::class.java)
+            if (product != null) {
+                onSuccess(product)
+            } else {
+                onFailure(Exception("Продукт не найден"))
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Если произошла ошибка при запросе, передаем ошибку в onFailure
+            onFailure(exception)
+        }
 }
+
+
 
