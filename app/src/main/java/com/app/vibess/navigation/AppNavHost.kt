@@ -6,11 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.compose.material3.Text
 import com.app.vibess.ui.components.SplashScreen
 import com.app.vibess.ui.screens.*
-import com.app.vibess.functions.findProductById
-import com.app.vibess.data.model.Product
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
