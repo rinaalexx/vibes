@@ -9,4 +9,5 @@ buildscript {
         // Убедитесь, что эта зависимость присутствует
         classpath("com.google.gms:google-services:4.3.15") // Или последняя доступная версия
     }
+
 }

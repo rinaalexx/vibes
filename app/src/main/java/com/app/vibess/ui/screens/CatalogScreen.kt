@@ -1,73 +1,70 @@
 package com.app.vibess.ui.screens
 
-import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 
 @Composable
 fun CatalogScreen(navController: NavController) {
-    // Список категорий для отображения
-    val categories = listOf("Футболки", "Худи")
+    // Категории с названиями на русском и ключами для навигации
+    val categories = listOf(
+        "Футболки" to "tshirt",
+        "Худи" to "hoodie"
+    )
 
-    // Главная колонка с категориями
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
         Text(
             text = "Каталог",
-            modifier = Modifier.padding(bottom = 16.dp)
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Отображение каждой категории
-        categories.forEach { category ->
-            CategoryItem(category = category, navController = navController)
+        categories.forEach { (displayName, routeName) ->
+            CategoryItem(
+                categoryName = displayName,
+                routeName = routeName,
+                navController = navController
+            )
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: String, navController: NavController) {
-    // Количество пространства между категориями
-    Spacer(modifier = Modifier.height(16.dp))
-
-    // Стиль для карточки категории
+fun CategoryItem(categoryName: String, routeName: String, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                // Навигация по категориям
-                navController.navigate("catalog/$category")
-            },
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .height(140.dp)
+            .clickable { navController.navigate("catalog/$routeName") },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEFEFEF)),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = MaterialTheme.shapes.medium
     ) {
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = category,
-                color = Color.Black
+                text = categoryName,
+                color = Color.Black,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CatalogScreenPreview() {
-    CatalogScreen(navController = rememberNavController())
 }
