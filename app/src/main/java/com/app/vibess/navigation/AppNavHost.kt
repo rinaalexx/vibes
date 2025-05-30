@@ -10,7 +10,7 @@ import androidx.navigation.navArgument
 import com.app.vibess.ui.screens.*
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController,authViewModel: AuthViewModel) {
     NavHost(
         navController = navController,
         startDestination = "home"
@@ -30,18 +30,28 @@ fun AppNavHost(navController: NavHostController) {
         composable("catalog") {
             CatalogScreen(navController = navController)
         }
+        composable("profile") {
+          ProfileScreen(navController = navController)
+        }
 
         composable("catalog/{category}") { backStackEntry ->
             val category = backStackEntry.arguments?.getString("category")
             CategoryDetailScreen(category = category ?: "Unknown", navController = navController)
         }
+        composable("login"){
+            LoginPage(navController,authViewModel)
+        }
+        composable("signup"){
+            SignupPage(navController,authViewModel)
+        }
+
 
         composable(
             route = "product/{productSku}",
             arguments = listOf(navArgument("productSku") { type = NavType.IntType })
         ) { backStackEntry ->
             val productSku = backStackEntry.arguments?.getInt("productSku") ?: 0
-            ProductDetailScreen(productSku = productSku)
+            ProductDetailScreen(productSku = productSku, navController = navController)
         }
 
 

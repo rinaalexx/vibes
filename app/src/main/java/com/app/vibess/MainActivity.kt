@@ -3,6 +3,7 @@ package com.app.vibess
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import com.app.vibess.ui.components.LogoHeader
 import com.app.vibess.ui.theme.VibesTheme
 import com.cloudinary.android.MediaManager
 import androidx.compose.ui.Modifier
+import com.app.vibess.ui.screens.AuthViewModel
 import kotlinx.coroutines.delay
 
 
@@ -28,6 +30,8 @@ class MainActivity : ComponentActivity() {
             "api_secret" to "Ls_GdFqHyraZq0UmEoq0AmR8PjQ"
         )
         MediaManager.init(this, config)
+        val authViewModel : AuthViewModel by viewModels()
+
 
 
         // Получаем ссылку на Firestore
@@ -65,7 +69,7 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.padding(innerPadding)  // вот здесь используем padding
                         .fillMaxSize()) {
                         LogoHeader() // Логотип сверху
-                        AppNavHost(navController = navController)  // Навигация
+                        AppNavHost(navController = navController, authViewModel)  // Навигация
                     }
                 }
             }

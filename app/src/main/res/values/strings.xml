@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">vibess</string>
-    <string name="nav_home">Home</string>
-    <string name="nav_catalog">Catalog</string>
-    <string name="nav_cart">Cart</string>
-    <string name="nav_profile">Profile</string>
+    <string name="nav_home" translatable="false">Home</string>
+    <string name="nav_catalog" translatable="false">Catalog</string>
+    <string name="nav_cart" translatable="false">Cart</string>
+    <string name="nav_profile" translatable="false">Profile</string>
 
 </resources>

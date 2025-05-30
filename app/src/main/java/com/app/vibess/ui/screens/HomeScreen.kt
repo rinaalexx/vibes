@@ -22,22 +22,20 @@ import com.app.vibess.R
 import com.app.vibess.data.model.Product
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
 fun HomeScreen(
     onShopNowClick: () -> Unit,
     onCreateNowClick: () -> Unit,
-    onCategoryClick: (String) -> Unit
+    onCategoryClick: (String) -> Unit,
 ) {
     // Категории
     val categories = listOf(
         CategoryItem("T-Shirts", R.drawable.tshirt),
         CategoryItem("Hoodie", R.drawable.hoodie)
     )
-
-
-
     val scrollState = rememberScrollState()
 
     Column(

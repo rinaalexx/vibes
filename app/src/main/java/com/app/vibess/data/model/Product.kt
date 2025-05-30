@@ -10,6 +10,28 @@ data class Product(
     val stock: Int = 0
 )
 
+data class Cart(
+    val userId: Int,
+    val items: List<CartItem> = emptyList() // Список товаров в корзине
+)
+
+data class CartItem(
+    val cartId: Int = 0,
+    val productSku: Int = 0,
+    val quantity: Int = 0,
+    val customizationId: Int? = null
+)
+
+
+
+data class Customization(
+    val customizationId: Int,
+    val productId: Int,
+    val text: String?,
+    val imageUrl: String?,
+    val color: String?,
+    val position: String?
+)
 
 
 // Корзина — список товаров (глобально, например, в синглтоне или ViewModel)
