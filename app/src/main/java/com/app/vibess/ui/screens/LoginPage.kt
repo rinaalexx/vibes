@@ -2,6 +2,10 @@ package com.app.vibess.ui.screens
 
 
 import android.widget.Toast
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +34,24 @@ import androidx.navigation.NavController
 
 @Composable
 fun LoginPage(navController: NavController,authViewModel: AuthViewModel) {
+    var isLoading by remember { mutableStateOf(true) }
+    val scale = remember { Animatable(1f) }
 
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            scale.animateTo(
+                targetValue = 1.5f,
+                animationSpec = infiniteRepeatable(
+                    animation = keyframes {
+                        durationMillis = 1000
+                        1.5f at 500
+                        1f at 1000
+                    },
+                    repeatMode = RepeatMode.Restart
+                )
+            )
+        }
+    }
 
 
     var email by remember {

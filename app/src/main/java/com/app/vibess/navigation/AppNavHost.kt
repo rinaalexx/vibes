@@ -20,10 +20,9 @@ fun AppNavHost(navController: NavHostController,authViewModel: AuthViewModel) {
         composable("home") {
             HomeScreen(
                 onShopNowClick = { navController.navigate("catalog") },
-                onCreateNowClick = { navController.navigate("customization") },
+                onCreateNowClick = { navController.navigate("custom") },
                 onCategoryClick = { categoryName ->
-                    navController.navigate("catalog?category=${categoryName.lowercase()}")
-                }
+                    navController.navigate("catalog/${categoryName.lowercase()}")                }
             )
         }
 
@@ -32,6 +31,21 @@ fun AppNavHost(navController: NavHostController,authViewModel: AuthViewModel) {
         }
         composable("profile") {
           ProfileScreen(navController = navController)
+        }
+        composable("cart") {
+            CartScreen(navController = navController)
+        }
+        composable("checkout_screen") {
+            CheckoutScreen(navController = navController)
+        }
+        composable("order_confirmed") {
+            OrderScreen(navController = navController)
+        }
+        composable("custom"){
+            CustomizationChoice(navController=navController)
+        }
+        composable("custom/tshirt"){
+            CustomTshirtScreen(navController=navController)
         }
 
         composable("catalog/{category}") { backStackEntry ->
@@ -55,9 +69,6 @@ fun AppNavHost(navController: NavHostController,authViewModel: AuthViewModel) {
         }
 
 
-        composable("customization")
-        {
-            CustomizationScreen(navController = navController)
-        }
+
     }
 }

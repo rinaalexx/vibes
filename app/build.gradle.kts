@@ -88,6 +88,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.foundation.layout.android)
+    implementation(libs.ads.mobile.sdk)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,5 +1,10 @@
 package com.app.vibess.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,7 +27,13 @@ import com.app.vibess.R
 import com.app.vibess.data.model.Product
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 
 
 @Composable
@@ -33,10 +44,28 @@ fun HomeScreen(
 ) {
     // Категории
     val categories = listOf(
-        CategoryItem("T-Shirts", R.drawable.tshirt),
-        CategoryItem("Hoodie", R.drawable.hoodie)
+        CategoryItem("tShirt", R.drawable.tshirt),
+        CategoryItem("hoodie", R.drawable.hoodie)
     )
     val scrollState = rememberScrollState()
+    var isLoading by remember { mutableStateOf(true) }
+    val scale = remember { Animatable(1f) }
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            scale.animateTo(
+                targetValue = 1.5f,
+                animationSpec = infiniteRepeatable(
+                    animation = keyframes {
+                        durationMillis = 1000
+                        1.5f at 500
+                        1f at 1000
+                    },
+                    repeatMode = RepeatMode.Restart
+                )
+            )
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,11 +79,10 @@ fun HomeScreen(
 
         // Баннер New Collection
         Image(
-            painter = painterResource(R.drawable.new_collection_banner),
+            painter = painterResource( R.drawable.new_collection_banner),
             contentDescription = "New Collection Banner",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp),
+                .fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
 
@@ -65,7 +93,13 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Button(onClick = onShopNowClick) {
+            Button(onClick = onShopNowClick,
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color(0xff443F3F),       // цвет текста
+                    containerColor = Color.White),
+                border = BorderStroke(1.dp, Color.DarkGray),
+                shape = RoundedCornerShape(5.dp),
+            ) {
                 Text("SHOP NOW")
             }
         }
@@ -75,8 +109,8 @@ fun HomeScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
-            shape = RoundedCornerShape(12.dp),
+                .height(230.dp),
+            shape = RoundedCornerShape(6.dp),
             colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.3f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
@@ -85,7 +119,8 @@ fun HomeScreen(
                     painter = painterResource(R.drawable.custom_banner),
                     contentDescription = "Custom background",
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+
                 )
                 Button(
                     onClick = onCreateNowClick,
@@ -93,9 +128,10 @@ fun HomeScreen(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 16.dp),
                     shape = RoundedCornerShape(5.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("CREATE NOW", color = MaterialTheme.colorScheme.onPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = Color.White,       // цвет текста
+                        containerColor = Color(0xff7C0000))){
+                    Text("CREATE NOW")
                 }
             }
         }
@@ -107,7 +143,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(140.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.Center
         ) {
             // Вызов items с правильным типом - список категорий
             items(categories) { category ->
@@ -160,7 +196,7 @@ fun CategoryCard(category: CategoryItem, onClick: () -> Unit) {
             )
             Text(
                 text = category.name,
-                color = Color.White,
+                color = Color.Black,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(12.dp),

@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
@@ -17,6 +18,7 @@ fun ImagePicker(
         uri?.let { onImageSelected(it) }
     }
     Button(onClick = { launcher.launch("image/*") }) {
-        Text("Загрузить изображение")
+        Text(color = Color.White,
+        text= "Загрузить изображение")
     }
 }

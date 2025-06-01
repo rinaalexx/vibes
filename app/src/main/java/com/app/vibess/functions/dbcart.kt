@@ -35,13 +35,42 @@ class AuthViewModelCart : ViewModel() {
                 }
         }
     }
+    fun removeFromCart(cartId: Int, productSku: Int, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val cartItemRef = db.collection("cart_items")
+
+        // Ищем товар в cart_items
+        cartItemRef
+            .whereEqualTo("cartId", cartId)
+            .whereEqualTo("productSku", productSku)
+            .get()
+            .addOnSuccessListener { result ->
+                if (!(result.isEmpty)) {
+                    val existingItem = result.documents.first()
+                    // Удаляем товар из корзины
+                    cartItemRef.document(existingItem.id).delete()
+                        .addOnSuccessListener {
+                            onSuccess() // Уведомление об успешном удалении
+                        }
+                        .addOnFailureListener { e ->
+                            onFailure("Error removing item: ${e.message}")
+                        }
+                } else {
+                    onFailure("Item not found in cart.")
+                }
+            }
+            .addOnFailureListener { e ->
+                onFailure("Error fetching item: ${e.message}")
+            }
+    }
+
 
 
     // Получение всех товаров из корзины
     fun getCartItems(cartId: Int, onCartItemsLoaded: (List<CartItem>) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         db.collection("cart_items")
-            .whereEqualTo("cart_id", cartId)
+            .whereEqualTo("cartId", cartId)
             .get()
             .addOnSuccessListener { result ->
                 val cartItems = result.map { document ->
@@ -50,7 +79,7 @@ class AuthViewModelCart : ViewModel() {
                 onCartItemsLoaded(cartItems)
             }
             .addOnFailureListener { e ->
-                // Обработка ошибок
+                Log.e("Cart", "Error fetching cart items", e)
             }
     }
 
@@ -99,6 +128,26 @@ class AuthViewModelCart : ViewModel() {
             }
             .addOnFailureListener { e ->
                 Log.e("Cart", "Error updating item quantity", e)
+            }
+    }
+    fun removeFromCart(cartId: Int, productSku: Int) {
+        val db = FirebaseFirestore.getInstance()
+        val cartItemRef = db.collection("cart_items")
+
+        // Ищем товар в cart_items
+        cartItemRef
+            .whereEqualTo("cartId", cartId)
+            .whereEqualTo("productSku", productSku)
+            .get()
+            .addOnSuccessListener { result ->
+                if (!(result.isEmpty)) {
+                    val existingItem = result.documents.first()
+                    // Удаляем товар из корзины
+                    cartItemRef.document(existingItem.id).delete()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Cart", "Error removing item from cart", e)
             }
     }
 

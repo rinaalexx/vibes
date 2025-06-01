@@ -1,5 +1,6 @@
 package com.app.vibess.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
@@ -13,6 +14,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ViewList   // для каталога
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val title: String) {
@@ -32,7 +35,10 @@ fun BottomBar(navController: NavController) {
     )
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        modifier = Modifier.background(Color.White)
+    ){
+
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
@@ -51,8 +57,8 @@ fun BottomBar(navController: NavController) {
                             restoreState = false
                         }
                     }
-                }
-            )
+                },
+               colors = NavigationBarItemDefaults.colors(Color.Black, Color.Gray, Color.White, Color.Gray))
         }
     }
 }

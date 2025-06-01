@@ -25,12 +25,43 @@ data class CartItem(
 
 
 data class Customization(
-    val customizationId: Int,
-    val productId: Int,
+    val customizationId: Int= 0 ,
+    val productId: Int= 0,
     val text: String?,
     val imageUrl: String?,
     val color: String?,
     val position: String?
+)
+data class User(
+    val firstName: String? = "",
+    val lastName: String? = "",
+    val orderHistory: List<String> = emptyList(),  // Пустой список заказов по умолчанию
+    val activeOrders: List<String> = emptyList(),   // Пустой список активных заказов по умолчанию
+    val email: String? = "",
+    val password: String = ""
+)
+data class Order(
+    val orderId: String = "",  // Уникальный идентификатор заказа
+    val userId: String = "",  // Идентификатор пользователя
+    val totalPrice: Double = 0.0,  // Общая цена заказа
+    val status: String = "Processing",  // Статус заказа (обрабатывается, отправлен и т.д.)
+    val shippingMethod: String = "",  // Способ доставки
+    val shippingAddress: String = "",  // Адрес доставки
+    val firstName: String = "",  // Имя заказчика
+    val lastName: String = ""  // Фамилия заказчика
+)
+
+data class OrderItem(
+    val orderId: String? = "",  // Ссылка на заказ
+    val items: List<CartItem> = emptyList()  // Список товаров в корзине
+)
+
+
+data class Shipping(
+    val orderId :String? = "",
+    val shippingMethod: String = "",
+    val shippingAddress: String = "",
+    val shippingStatus: String = "Pending"
 )
 
 

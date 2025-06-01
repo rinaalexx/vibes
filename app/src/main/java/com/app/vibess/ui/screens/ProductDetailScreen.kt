@@ -1,6 +1,7 @@
 package com.app.vibess.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -137,54 +139,95 @@ fun ProductDetailScreen(productSku: Int, navController: NavController) {
                             color = Color.White
                         )
                     }
-                } else {
-
-                    Row( modifier = Modifier.padding(16.dp))
-                    {
-
-
-                        // Если товар добавлен, показываем другой UI
-                        Button(
-                            onClick = {},
-                     //       modifier = Modifier
-                       //         .width(200.dp)
-                         //       .padding(bottom = 16.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                 } else{
+                // Кнопка "В корзине" с плюсиком и минусиком
+                    // Кнопка "В корзине" с плюсиком и минусиком
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Контейнер с кнопками "+" и "-"
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "Добавлено в корзину",
-                                color = Color.Black
-                            )
-                        }
-
-
-
-                        Button(
-                            onClick = {
-                                quantity += 1  // Увеличиваем количество товара
-                                // Логика обновления количества товара в корзине
-                                val authViewModel = AuthViewModelCart()
-                                authViewModel.updateCartItemQuantity(
-                                    cartId = currentUser!!.uid.hashCode(),
-                                    productSku = product!!.sku,
-                                    newQuantity = quantity
+                            // Кнопка "-"
+                            Button(
+                                onClick = {
+                                    if (quantity > 1) {
+                                        quantity -= 1
+                                        val authViewModel = AuthViewModelCart()
+                                        authViewModel.updateCartItemQuantity(
+                                            cartId = currentUser!!.uid.hashCode(),
+                                            productSku = product!!.sku,
+                                            newQuantity = quantity
+                                        )
+                                    } else {
+                                        // Удаляем товар, если количество стало 1
+                                        val authViewModel = AuthViewModelCart()
+                                        authViewModel.removeFromCart(
+                                            cartId = currentUser!!.uid.hashCode(),
+                                            productSku = product!!.sku
+                                        )
+                                        isAddedToCart = false
+                                    }
+                                },
+                                modifier = Modifier.padding(end = 16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(
+                                    text = "-",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
                                 )
-                            },
-                            modifier = Modifier.padding(start = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                            }
 
-                        ) {
-                            Text("+")
+                            // Количество товара
+                            Text(
+                                text = "$quantity",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            // Кнопка "+"
+                            Button(
+                                onClick = {
+                                    quantity += 1
+                                    val authViewModel = AuthViewModelCart()
+                                    authViewModel.updateCartItemQuantity(
+                                        cartId = currentUser!!.uid.hashCode(),
+                                        productSku = product!!.sku,
+                                        newQuantity = quantity
+                                    )
+                                },
+                                modifier = Modifier.padding(start = 16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(
+                                    text = "+",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
+                        // Текст "В корзине"
+                        Text(
+                            text = "В корзине",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
                 }
-                }
             }
-
-
-
+        }
         else -> Text("Продукт не найден")
     }
 }
