@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +40,14 @@ fun CustomTshirtScreen(navController: NavController) {
     var textToAdd by remember { mutableStateOf(TextFieldValue("")) }
     var textColor by remember { mutableStateOf(Color.Black) }
     var textPosition by remember { mutableStateOf("bottom") }
+    var textFont by remember { mutableStateOf("Inter") }
     var isImageLoaded by remember { mutableStateOf(false) } // Отслеживаем, загружено ли изображение
     var isTextEditingEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли режим редактирования текста
+    var isColorPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор цвета
+    var isPositionPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор положения
+    var isFontPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор шрифта
+    var isTextEntered by remember { mutableStateOf(false) } // Отслеживаем, введен ли текст
+    var isTextEditing by remember { mutableStateOf(false) } // Отслеживаем, введен ли текст
 
     // Используем launcher для выбора изображения из галереи
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -56,15 +64,7 @@ fun CustomTshirtScreen(navController: NavController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Показываем футболку сразу на экране
-        Image(
-            painter = rememberAsyncImagePainter("https://res.cloudinary.com/dxdspcnk6/image/upload/v1748125075/custom_thirt_cqlrbc.png"),
-            contentDescription = "Футболка",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp),
-            contentScale = ContentScale.Fit
-        )
+
 
         // Кнопка для загрузки изображения
         if (!isImageLoaded) {
@@ -75,7 +75,7 @@ fun CustomTshirtScreen(navController: NavController) {
         }
 
         // Иконка для текста, которая появляется после загрузки изображения
-        if (isImageLoaded) {
+        if (isImageLoaded && !isTextEntered) {
             IconButton(onClick = { isTextEditingEnabled = !isTextEditingEnabled }) {
                 Icon(painter = painterResource(id = R.drawable.ic_text), contentDescription = "Текст")
             }
@@ -85,18 +85,104 @@ fun CustomTshirtScreen(navController: NavController) {
 
         // Если текстовое редактирование включено, показываем кнопки
         if (isTextEditingEnabled) {
+            // Кнопка для ввода текста
+            Button(onClick = { isTextEntered = true; isTextEditing = true;isTextEditingEnabled=false  }) {
+                Text("Ввести текст", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Поле для ввода текста
+            OutlinedTextField(
+                value = textToAdd,
+                onValueChange = { textToAdd = it },
+                label = { Text("Введите текст") }, // Подсказка для ввода текста
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFEFEFEF)) // Цвет фона для поля
+                    .padding(16.dp),
+                textStyle = TextStyle(color = textColor),
+                singleLine = true // Сделаем текстовое поле однострочным
+            )
+        }
+
+        // Когда текст введен, показываем кнопки для выбора цвета, положения и шрифта
+        if ((isTextEntered) and (isTextEditing)){
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Кнопки для выбора цвета, положения и шрифта
+            Button(onClick = { isColorPickerEnabled = true; isTextEditing = false }) {
+                Text("Цвет", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { isPositionPickerEnabled = true; isTextEditing = false }) {
+                Text("Положение", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { isFontPickerEnabled = true; isTextEditing = false }) {
+                Text("Шрифт", color = Color.White)
+            }
+        }
+
+        // Цвет текста
+        if ((isColorPickerEnabled) and (!isPositionPickerEnabled) and (!isFontPickerEnabled)) {
             Row {
-                Button(onClick = { /* Логика для ввода текста */ }) {
-                    Text("Ввести текст", color = Color.White)
+                Button(onClick = { textColor = Color.Black; isTextEditing=true; isColorPickerEnabled=false }) {
+                    Text("Черный", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textColor = Color.Red }) {
-                    Text("Цвет", color = Color.White)
+                Button(onClick = { textColor = Color(0xFF4B3221); isTextEditing=true; isColorPickerEnabled=false }) {
+                    Text("Коричневый", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textPosition = "bottom" }) {
-                    Text("Положение", color = Color.White)
+                Button(onClick = { textColor = Color(0xFF6B0202); isTextEditing=true; isColorPickerEnabled=false  }) {
+                    Text("Красный", color = Color.White)
                 }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { isColorPickerEnabled = false; isTextEditing=true; isColorPickerEnabled=false }) {
+                Text("Назад", color = Color.White)
+            }
+        }
+
+        // Положение текста
+        if (isPositionPickerEnabled) {
+            Row {
+                Button(onClick = { textPosition = "top"; isTextEditing=true; isPositionPickerEnabled= false }) {
+                    Text("Сверху", color = Color.White)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { textPosition = "bottom" ; isTextEditing=true; isPositionPickerEnabled= false }) {
+                    Text("Снизу", color = Color.White)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { isPositionPickerEnabled = false; isTextEditing=true }) {
+                Text("Назад", color = Color.White)
+            }
+        }
+
+        // Шрифт текста
+        if (isFontPickerEnabled) {
+            Row {
+                Button(onClick = { textFont = "Inter"; isFontPickerEnabled = false;  isTextEditing=true }) {
+                    Text("Inter", color = Color.White)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { textFont = "Italianno"; isFontPickerEnabled = false;  isTextEditing=true }) {
+                    Text("Italianno", color = Color.White)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { isFontPickerEnabled = false }) {
+                Text("Назад", color = Color.White)
             }
         }
 
@@ -134,6 +220,10 @@ fun CustomTshirtScreen(navController: NavController) {
         }
     }
 }
+
+
+
+
 
 // Функция для загрузки изображения в Cloudinary
 fun uploadImageToCloudinary(uri: Uri, context: Context, scale: Float, position: String, text: String) {
