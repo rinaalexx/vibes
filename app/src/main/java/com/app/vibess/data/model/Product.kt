@@ -19,18 +19,18 @@ data class CartItem(
     val cartId: Int = 0,
     val productSku: Int = 0,
     val quantity: Int = 0,
-    val customizationId: Int? = null
+    val customizationId: String = ""
 )
 
 
 
 data class Customization(
-    val customizationId: Int= 0 ,
-    val productId: Int= 0,
-    val text: String?,
-    val imageUrl: String?,
-    val color: String?,
-    val position: String?
+    val category: String,      // Категория товара (tshirt или hoodie)
+    val imageUrl: String,     // Ссылка на изображение
+    val text: String,         // Текст на товаре
+    val textColor: String,    // Цвет текста
+    val textPosition: String, // Положение текста (top/bottom)
+    val font: String          // Шрифт текста
 )
 data class User(
     val firstName: String? = "",

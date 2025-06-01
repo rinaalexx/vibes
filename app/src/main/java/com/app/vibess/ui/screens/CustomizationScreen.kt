@@ -2,38 +2,33 @@ package com.app.vibess.ui.screens
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.app.vibess.R
 import com.app.vibess.ui.components.custom.ImagePicker
 import com.app.vibess.ui.components.custom.TShirtCustomizerWithGestures
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.UploadCallback
 import com.cloudinary.android.callback.ErrorInfo
-import com.google.firebase.database.FirebaseDatabase
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import com.app.vibess.data.model.Customization
+import com.app.vibess.functions.AuthViewModelCart
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CustomTshirtScreen(navController: NavController) {
@@ -59,6 +54,11 @@ fun CustomTshirtScreen(navController: NavController) {
         }
     }
 
+    val userId = FirebaseAuth.getInstance().currentUser?.uid?: "" // Получаем UID текущего пользователя
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+
+    var imageUrlForsave: String? = null;
     val context = LocalContext.current
 
     Column(
@@ -239,7 +239,6 @@ fun CustomTshirtScreen(navController: NavController) {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            // Кнопка для сохранения данных
             if (isImageLoaded) {
                 Button(
                     onClick = {
@@ -248,10 +247,33 @@ fun CustomTshirtScreen(navController: NavController) {
                             uploadImageToCloudinary(
                                 imageUri,
                                 context,
-                                scale,
-                                textPosition,
-                                textToAdd.text
-                            )
+                                userId
+                            ) { imageUrl ->
+                                if (imageUrl != null) {
+                                    imageUrlForsave = imageUrl
+                                    // Получаем ссылку на изображение и используем ее
+                                    Log.d("ImageUpload", "Image uploaded successfully: $imageUrl")
+                                    val customization = Customization(
+                                        category = "tshirt", // или hoodie
+                                        imageUrl = imageUrl,
+                                        text = textToAdd.text,
+                                        textColor = textColor.toString(),
+                                        textPosition = textPosition,
+                                        font = textFont
+                                    )
+                                    val authViewModel = AuthViewModelCart()
+                                    authViewModel.addToCartWithCustomization(
+                                       currentUser!!.uid.hashCode(),
+                                        imageUrlForsave,
+                                        1,
+                                        customization,
+                                        "tshirt"
+                                    )
+                                } else {
+                                    // Обработка ошибки
+                                    Log.e("ImageUpload", "Image upload failed")
+                                }
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black), // Черная кнопка для сохранения
@@ -259,7 +281,7 @@ fun CustomTshirtScreen(navController: NavController) {
                         .padding(16.dp)
                         .height(56.dp) // Увеличиваем размер кнопки
                 ) {
-                    Text("Сохранить", color = Color.White) // Белый текст
+                    Text("Сохранить и добавить в корзину", color = Color.White) // Белый текст
                 }
 
 
@@ -297,11 +319,14 @@ fun CustomTshirtScreen(navController: NavController) {
 
 
 
-// Функция для загрузки изображения в Cloudinary
-fun uploadImageToCloudinary(uri: Uri, context: Context, scale: Float, position: String, text: String) {
+fun uploadImageToCloudinary(uri: Uri, context: Context, userId: String, callback: (String?) -> Unit) {
+    // Формируем имя файла как uid пользователя
+    val fileName = "$userId.jpg"  // Название файла, будет использовать uid пользователя
+
     // Загружаем изображение в Cloudinary
     MediaManager.get().upload(uri)
         .unsigned("kks8dyht") // Ваш unsigned upload preset
+        .option("public_id", fileName) // Устанавливаем имя файла (public_id) как uid пользователя
         .callback(object : UploadCallback {
             override fun onStart(requestId: String?) {
                 // Загрузка началась
@@ -317,38 +342,20 @@ fun uploadImageToCloudinary(uri: Uri, context: Context, scale: Float, position: 
                 val imageUrl = resultData?.get("url") as String
                 Toast.makeText(context, "Загрузка успешна", Toast.LENGTH_SHORT).show()
 
-                // Сохраняем URL изображения и дополнительные данные в Firebase
-                saveImageDataToDatabase(imageUrl, scale, position, text)
+                // Возвращаем ссылку на изображение через callback
+                callback(imageUrl)
             }
 
             override fun onError(requestId: String?, error: ErrorInfo?) {
                 // Ошибка загрузки
                 Toast.makeText(context, "Ошибка загрузки: $error", Toast.LENGTH_SHORT).show()
+                callback(null)
             }
 
             override fun onReschedule(requestId: String?, error: ErrorInfo?) {
                 // Повторная попытка загрузки
                 Toast.makeText(context, "Загрузка отложена: $error", Toast.LENGTH_SHORT).show()
+                callback(null)
             }
         }).dispatch() // Запускаем запрос
 }
-
-// Функция для сохранения данных в Firebase
-fun saveImageDataToDatabase(imageUrl: String, scale: Float, position: String, text: String) {
-    val database = FirebaseDatabase.getInstance() // Получаем ссылку на базу данных Firebase
-    val myRef = database.getReference("userImages") // Ссылка на таблицу с изображениями
-
-    // Создаем новый уникальный ключ и сохраняем данные
-    val newImageRef = myRef.push() // Создаем уникальный ключ для нового изображения
-
-    // Данные, которые мы хотим сохранить: URL, масштаб, позиция, текст
-    val imageData = mapOf(
-        "imageUrl" to imageUrl,
-        "scale" to scale,
-        "position" to position,
-        "text" to text,
-        "timestamp" to System.currentTimeMillis() // Время загрузки
-    )
-
-    newImageRef.setValue(imageData)
-}// Сохраняем данные в Firebase

@@ -3,6 +3,7 @@ package com.app.vibess.functions
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.app.vibess.data.model.CartItem
+import com.app.vibess.data.model.Customization
 import com.app.vibess.data.model.Product
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,10 +20,10 @@ class AuthViewModelCart : ViewModel() {
             // Если кастомизации нет, передаем null для customizationId
             val cartItem = if (customizationId == null) {
                 // Простой продукт без кастомизации
-                CartItem(cartId, productSku, quantity, 0)
+                CartItem(cartId, productSku, quantity, "")
             } else {
                 // Продукт с кастомизацией
-                CartItem(cartId, 0, quantity, customizationId)
+                val f=2*2
             }
 
             db.collection("cart_items")
@@ -148,6 +149,53 @@ class AuthViewModelCart : ViewModel() {
             }
             .addOnFailureListener { e ->
                 Log.e("Cart", "Error removing item from cart", e)
+            }
+    }
+
+    fun addToCartWithCustomization(
+        cartId: Int,
+        imageUrl: String?,
+        quantity: Int,
+        customization: Customization,
+        category: String
+    ) {
+        val db = FirebaseFirestore.getInstance()
+
+        // Сначала сохраняем кастомизацию в коллекцию "customization"
+        val customizationRef = db.collection("customization").document()
+
+        // Создаем кастомизацию
+        val customizationData = Customization(
+            category = category, // Убедитесь, что category передается правильно (tshirt или hoodie)
+            imageUrl = imageUrl ?: "", // Используем переданную ссылку на изображение
+            text = customization.text, // Используем текст из переданных данных
+            textColor = customization.textColor, // Цвет текста из переданных данных
+            textPosition = customization.textPosition, // Положение текста
+            font = customization.font // Шрифт текста
+        )
+
+        // Сохраняем кастомизацию в Firestore
+        customizationRef.set(customizationData)
+            .addOnSuccessListener {
+                // После того, как кастомизация сохранена, получаем ID этой кастомизации
+                val customizationId = customizationRef.id
+
+                // Теперь добавляем товар в корзину
+                val cartItem = CartItem(cartId, 0, quantity, customizationId) // Пример с productSku = 0, если это кастомный товар
+                db.collection("cart_items")
+                    .add(cartItem)
+                    .addOnSuccessListener {
+                        // Успешно добавлено в корзину
+                        Log.d("Cart", "Товар с кастомизацией добавлен в корзину")
+                    }
+                    .addOnFailureListener { e ->
+                        // Обработка ошибок
+                        Log.e("Cart", "Ошибка добавления товара в корзину", e)
+                    }
+            }
+            .addOnFailureListener { e ->
+                // Обработка ошибок при сохранении кастомизации
+                Log.e("Customization", "Ошибка сохранения кастомизации", e)
             }
     }
 
