@@ -32,6 +32,8 @@ import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.UploadCallback
 import com.cloudinary.android.callback.ErrorInfo
 import com.google.firebase.database.FirebaseDatabase
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun CustomTshirtScreen(navController: NavController) {
@@ -42,7 +44,7 @@ fun CustomTshirtScreen(navController: NavController) {
     var textPosition by remember { mutableStateOf("bottom") }
     var textFont by remember { mutableStateOf("Inter") }
     var isImageLoaded by remember { mutableStateOf(false) } // Отслеживаем, загружено ли изображение
-    var isTextEditingEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли режим редактирования текста
+    var isTextAdd by remember { mutableStateOf(false) } // Отслеживаем, активен ли режим добавления текста
     var isColorPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор цвета
     var isPositionPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор положения
     var isFontPickerEnabled by remember { mutableStateOf(false) } // Отслеживаем, активен ли выбор шрифта
@@ -56,15 +58,16 @@ fun CustomTshirtScreen(navController: NavController) {
             isImageLoaded = true // Устанавливаем флаг, что изображение загружено
         }
     }
+
     val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween // Это прижмет контент к верхней и нижней части экрана
     ) {
-
 
         // Кнопка для загрузки изображения
         if (!isImageLoaded) {
@@ -76,18 +79,22 @@ fun CustomTshirtScreen(navController: NavController) {
 
         // Иконка для текста, которая появляется после загрузки изображения
         if (isImageLoaded && !isTextEntered) {
-            IconButton(onClick = { isTextEditingEnabled = !isTextEditingEnabled }) {
-                Icon(painter = painterResource(id = R.drawable.ic_text), contentDescription = "Текст")
+            Button(onClick = { isTextAdd = true; isTextEntered =true}) {
+                Text("Добавить текст", color = Color.White)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Если текстовое редактирование включено, показываем кнопки
-        if (isTextEditingEnabled) {
+        // Если добавление текста включено, показываем кнопки
+        if (isTextAdd && isTextEntered) {
             // Кнопка для ввода текста
-            Button(onClick = { isTextEntered = true; isTextEditing = true;isTextEditingEnabled=false  }) {
-                Text("Ввести текст", color = Color.White)
+            Button(onClick = {
+                isTextEntered = true
+                isTextEditing = true
+                isTextAdd = false
+            }) {
+                Text("Готово", color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -107,45 +114,57 @@ fun CustomTshirtScreen(navController: NavController) {
         }
 
         // Когда текст введен, показываем кнопки для выбора цвета, положения и шрифта
-        if ((isTextEntered) and (isTextEditing)){
+        if (isTextEntered && isTextEditing) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Кнопки для выбора цвета, положения и шрифта
-            Button(onClick = { isColorPickerEnabled = true; isTextEditing = false }) {
-                Text("Цвет", color = Color.White)
-            }
+            // Кнопки для выбора цвета, положения и шрифта в одном ряду
+            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { isColorPickerEnabled = true; isTextEditing = false  }) {
+                    Text("Цвет", color = Color.White)
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = { isPositionPickerEnabled = true; isTextEditing = false }) {
-                Text("Положение", color = Color.White)
-            }
+                Button(onClick = { isPositionPickerEnabled = true; isTextEditing = false  }) {
+                    Text("Положение", color = Color.White)
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = { isFontPickerEnabled = true; isTextEditing = false }) {
-                Text("Шрифт", color = Color.White)
+                Button(onClick = { isFontPickerEnabled = true; isTextEditing = false  }) {
+                    Text("Шрифт", color = Color.White)
+                }
             }
         }
 
-        // Цвет текста
+// Цвет текста
         if ((isColorPickerEnabled) and (!isPositionPickerEnabled) and (!isFontPickerEnabled)) {
             Row {
-                Button(onClick = { textColor = Color.Black; isTextEditing=true; isColorPickerEnabled=false }) {
+                Button(onClick = {
+                    textColor = Color.Black; isTextEditing = true; isColorPickerEnabled = false
+                }) {
                     Text("Черный", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textColor = Color(0xFF4B3221); isTextEditing=true; isColorPickerEnabled=false }) {
+                Button(onClick = {
+                    textColor = Color(0xFF4B3221); isTextEditing = true; isColorPickerEnabled =
+                    false
+                }) {
                     Text("Коричневый", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textColor = Color(0xFF6B0202); isTextEditing=true; isColorPickerEnabled=false  }) {
+                Button(onClick = {
+                    textColor = Color(0xFF6B0202); isTextEditing = true; isColorPickerEnabled =
+                    false
+                }) {
                     Text("Красный", color = Color.White)
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { isColorPickerEnabled = false; isTextEditing=true; isColorPickerEnabled=false }) {
+            Button(onClick = {
+                isColorPickerEnabled = false; isTextEditing = true; isColorPickerEnabled = false
+            }) {
                 Text("Назад", color = Color.White)
             }
         }
@@ -153,17 +172,21 @@ fun CustomTshirtScreen(navController: NavController) {
         // Положение текста
         if (isPositionPickerEnabled) {
             Row {
-                Button(onClick = { textPosition = "top"; isTextEditing=true; isPositionPickerEnabled= false }) {
+                Button(onClick = {
+                    textPosition = "top"; isTextEditing = true; isPositionPickerEnabled = false
+                }) {
                     Text("Сверху", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textPosition = "bottom" ; isTextEditing=true; isPositionPickerEnabled= false }) {
+                Button(onClick = {
+                    textPosition = "bottom"; isTextEditing = true; isPositionPickerEnabled = false
+                }) {
                     Text("Снизу", color = Color.White)
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { isPositionPickerEnabled = false; isTextEditing=true }) {
+            Button(onClick = { isPositionPickerEnabled = false; isTextEditing = true }) {
                 Text("Назад", color = Color.White)
             }
         }
@@ -171,20 +194,25 @@ fun CustomTshirtScreen(navController: NavController) {
         // Шрифт текста
         if (isFontPickerEnabled) {
             Row {
-                Button(onClick = { textFont = "Inter"; isFontPickerEnabled = false;  isTextEditing=true }) {
+                Button(onClick = {
+                    textFont = "Inter"; isFontPickerEnabled = false; isTextEditing = true
+                }) {
                     Text("Inter", color = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { textFont = "Italianno"; isFontPickerEnabled = false;  isTextEditing=true }) {
+                Button(onClick = {
+                    textFont = "Italianno"; isFontPickerEnabled = false; isTextEditing = true
+                }) {
                     Text("Italianno", color = Color.White)
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { isFontPickerEnabled = false }) {
+            Button(onClick = { isFontPickerEnabled = false; isTextEditing = true }) {
                 Text("Назад", color = Color.White)
             }
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -204,23 +232,67 @@ fun CustomTshirtScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Кнопка для сохранения данных
-        if (isImageLoaded) {
-            Button(
-                onClick = {
-                    // Сохраняем данные (ссылка на изображение, масштаб, позиция, текст) в Firebase
-                    selectedImageUri?.let { imageUri ->
-                        uploadImageToCloudinary(imageUri, context, scale, textPosition, textToAdd.text)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Green) // Зеленая кнопка для сохранения
-            ) {
-                Text("Сохранить", color = Color.White) // Белый текст
+        // Кнопка для сохранения данных и кнопка мусорной корзины
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            // Кнопка для сохранения данных
+            if (isImageLoaded) {
+                Button(
+                    onClick = {
+                        // Сохраняем данные (ссылка на изображение, масштаб, позиция, текст) в Firebase
+                        selectedImageUri?.let { imageUri ->
+                            uploadImageToCloudinary(
+                                imageUri,
+                                context,
+                                scale,
+                                textPosition,
+                                textToAdd.text
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black), // Черная кнопка для сохранения
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .height(56.dp) // Увеличиваем размер кнопки
+                ) {
+                    Text("Сохранить", color = Color.White) // Белый текст
+                }
+
+
+                // Кнопка мусорной корзины
+                IconButton(
+                    onClick = {
+                        // Сбрасываем все состояния
+                        selectedImageUri = null
+                        textToAdd = TextFieldValue("")
+                        textColor = Color.Black
+                        textPosition = "bottom"
+                        textFont = "Inter"
+                        isImageLoaded = false
+                        isTextAdd = false
+                        isColorPickerEnabled = false
+                        isPositionPickerEnabled = false
+                        isFontPickerEnabled = false
+                        isTextEntered = false
+                        isTextEditing = false
+                    },
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "Удалить",
+                        tint = Color(0xFFA61B1B)
+                    ) // Черный цвет мусорной корзины
+                }
             }
         }
     }
 }
-
 
 
 
@@ -278,5 +350,5 @@ fun saveImageDataToDatabase(imageUrl: String, scale: Float, position: String, te
         "timestamp" to System.currentTimeMillis() // Время загрузки
     )
 
-    newImageRef.setValue(imageData) // Сохраняем данные в Firebase
-}
+    newImageRef.setValue(imageData)
+}// Сохраняем данные в Firebase
